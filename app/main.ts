@@ -2,7 +2,7 @@ import * as net from "net";
 
 const server = net.createServer((socket) => {
   socket.on("close", () => {
-    socket.write(Buffer.from('HTTP/1.1 200 OK\r\n\r\n'))
+    socket.write('HTTP/1.1 200 OK\r\n\r\n')
     socket.end();
   });
 });
