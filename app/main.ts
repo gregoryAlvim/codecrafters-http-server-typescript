@@ -5,7 +5,7 @@ const server = net.createServer((socket) => {
       const request = data.toString().split(' ')
       const path = request[1]
       
-      const response = path === "/" ? "HTTP/1.1 200 OK\r\n\r\n" : "HTTP/1.1 200 OK\r\n\r\n"
+      const response = path === "/" ? "HTTP/1.1 200 OK\r\n\r\n" : "HTTP/1.1 404 OK\r\n\r\n"
 
       socket.write(response)
       socket.end()
