@@ -1,11 +1,16 @@
 import * as net from "net";
 
 const server = net.createServer((socket) => {
-    socket.write('HTTP/1.1 200 OK\r\n\r\n')
-    socket.end();
-});
+    socket.on('data', (data) => {
+      const request = data.toString().split(' ')
+      const path = request[1]
+      
+      const response = path === "/" ? "HTTP/1.1 200 OK\r\n\r\n" : "HTTP/1.1 200 OK\r\n\r\n"
 
-console.log("Logs from your program will appear here!");
+      socket.write(response)
+      socket.end()
+    })
+});
 
 server.listen(4221, "localhost", () => {
   console.log("Server is running on port 4221");
