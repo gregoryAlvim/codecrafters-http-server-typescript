@@ -8,11 +8,6 @@ const server = net.createServer((socket) => {
       const [method, rootPath, httpVersion] = status.split(" ");
       const [_, path, param] = rootPath.split('/')
 
-      const sendResponse = (response: string) => {
-        socket.write(response)
-        socket.end()
-      }
-
       switch (path) {
         case "":
           sendResponse("HTTP/1.1 200 OK\r\n\r\n")
@@ -30,6 +25,11 @@ const server = net.createServer((socket) => {
           break;
       }
     })
+
+    function sendResponse(response: string) {
+      socket.write(response)
+      socket.end()
+    }
 });
 
 server.listen(4221, "localhost", () => {
