@@ -22,7 +22,8 @@ const server = net.createServer((socket) => {
           break;
         case "user-agent":
           const [_, userAgent] = headers[1].split(" ");
-          sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`)
+          const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
+          sendResponse(response)
           break;
       
         default:
