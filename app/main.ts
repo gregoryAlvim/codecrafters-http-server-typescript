@@ -6,8 +6,8 @@ const server = net.createServer((socket) => {
       const [rest, body] = data.toString().split('\r\n\r\n')
       const [status, ...headers] = rest.split("\r\n");
       const [method, path, httpVersion] = status.split(" ");
-      const [_, userAgent] = headers[2].split(" ");
-
+      const [_, userAgent] = headers[1].split(" ");
+      
       if (path === "/") {
         const response = "HTTP/1.1 200 OK\r\n\r\n"
         socket.write(response)
