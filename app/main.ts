@@ -5,9 +5,8 @@ const server = net.createServer((socket) => {
     socket.on('data', (data) => {
       const [rest, body] = data.toString().split('\r\n\r\n')
       const [status, ...headers] = rest.split("\r\n");
-
-      const path = status[1]
-      const userAgent = headers[3]
+      const [method, path, httpVersion] = status.split(" ");
+      const [_, userAgent] = headers[2].split(" ");
 
       if (path === "/") {
         const response = "HTTP/1.1 200 OK\r\n\r\n"
@@ -18,7 +17,6 @@ const server = net.createServer((socket) => {
         const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${query.length}\r\n\r\n${query}`
         socket.write(response)
       } else if (path === "/user-agent") {
-        const userAgent = headers[3]
         const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
         socket.write(response)
       } else {
