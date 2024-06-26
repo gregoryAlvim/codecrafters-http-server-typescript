@@ -8,6 +8,7 @@ const httpStatusCodes = {
 const server = net.createServer((socket) => {
     socket.on('data', (data) => {
       const request = data.toString().split(' ')
+      console.log(request)
       const path = request[1]
       console.log(path)
       const stringParam = path.split("/")[2]
