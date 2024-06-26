@@ -6,7 +6,7 @@ const server = net.createServer((socket) => {
       const [status, ...headers] = rest.split("\r\n");
 
       const [method, rootPath, httpVersion] = status.split(" ");
-      const path = rootPath.split('/')[1]
+      const [path, param] = rootPath.split('/')
 
       const sendResponse = (response: string) => {
         socket.write(response)
@@ -18,8 +18,7 @@ const server = net.createServer((socket) => {
           sendResponse("HTTP/1.1 200 OK\r\n\r\n")
           break;
         case "echo":
-          const stringParam = path.split("/echo/")[1]
-          sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${stringParam.length}\r\n\r\n${stringParam}`)
+          sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
           break;
         case "user-agent":
           const [_, userAgent] = headers[1].split(" ");
