@@ -1,11 +1,22 @@
 import * as net from "net";
 
+const httpStatusCodes = {
+  200: "OK",
+  404: "Not Found",
+}
+
 const server = net.createServer((socket) => {
     socket.on('data', (data) => {
       const request = data.toString().split(' ')
       const path = request[1]
-      
-      const response = path === "/" ? "HTTP/1.1 200 OK\r\n\r\n" : "HTTP/1.1 404 Not Found\r\n\r\n"
+      const stringParam = path.split("/")[1]
+
+      const response = `HTTP/1.1 200 OK
+      \r\nContent-Type: text/plain
+      \r\nContent-Length: ${stringParam.length}
+      \r\n\r\n
+      ${stringParam}
+      `
 
       socket.write(response)
       socket.end()
