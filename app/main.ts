@@ -26,6 +26,7 @@ const server = net.createServer((socket) => {
         case "files":
           const directory = process.argv[4]
           const pathFile = directory + param
+          console.log("pathFile: ",pathFile)
           if (fs.existsSync(pathFile)) {
             const stats = fs.statSync(pathFile)
             const content = fs.readFileSync(pathFile)
