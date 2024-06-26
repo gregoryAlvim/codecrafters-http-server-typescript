@@ -9,11 +9,9 @@ const server = net.createServer((socket) => {
     socket.on('data', (data) => {
       const request = data.toString().split(' ')
       const path = request[1]
-      console.log("path: ", path)
 
       if (path === "/") {
-        const stringParam = path.split("/")[1]
-        console.log(stringParam)
+        const stringParam = path.split("/")[0]
         const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${stringParam.length}\r\n\r\n${stringParam}`
         socket.write(response)
     
