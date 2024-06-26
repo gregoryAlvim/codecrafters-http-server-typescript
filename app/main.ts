@@ -6,7 +6,7 @@ const server = net.createServer((socket) => {
       const [status, ...headers] = rest.split("\r\n");
 
       const [method, rootPath, httpVersion] = status.split(" ");
-      const [path, param] = rootPath.split('/')
+      const [_, path, param] = rootPath.split('/')
 
       const sendResponse = (response: string) => {
         socket.write(response)
@@ -25,7 +25,6 @@ const server = net.createServer((socket) => {
           const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
           sendResponse(response)
           break;
-      
         default:
           sendResponse("HTTP/1.1 404 Not Found\r\n\r\n")
           break;
