@@ -1,4 +1,7 @@
-import * as net from "net";
+import * as fs from "node:fs";
+import * as net from "node:net";
+
+const notFoundResponse = "HTTP/1.1 404 Not Found\r\n\r\n"
 
 const server = net.createServer((socket) => {
     socket.on('data', (data) => {
@@ -15,13 +18,24 @@ const server = net.createServer((socket) => {
         case "echo":
           sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
           break;
-        case "user-agent":
-          const [_, userAgent] = headers[1].split(" ");
-          const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
-          sendResponse(response)
+        case "user-agent": { 
+            const [_, userAgent] = headers[1].split(" ");
+            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`)
+          }
+          break;
+        case "files":
+          const pathFile = `/tmp/${param}`
+          if (fs.existsSync(pathFile)) {
+            const stats = fs.statSync(pathFile)
+            const content = fs.readFileSync(pathFile)
+
+            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${stats.size}\r\n\r\n${content}`)
+          } else {
+            sendResponse(notFoundResponse)
+          }
           break;
         default:
-          sendResponse("HTTP/1.1 404 Not Found\r\n\r\n")
+          sendResponse(notFoundResponse)
           break;
       }
     })
