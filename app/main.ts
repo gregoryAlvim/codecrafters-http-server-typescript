@@ -30,7 +30,7 @@ const server = net.createServer((socket) => {
             const stats = fs.statSync(pathFile)
             const content = fs.readFileSync(pathFile)
 
-            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${stats.size}\r\n\r\n${content}`)
+            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${stats.size}\r\n\r\n${content}`)
           } else {
             sendResponse(notFoundResponse)
           }
