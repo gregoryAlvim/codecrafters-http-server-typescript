@@ -12,7 +12,7 @@ const server = net.createServer((socket) => {
         socket.write(response)
       }
       else if (path.includes("echo/")) {
-        const query = path.split("echo/")
+        const query = path.split("/echo/")[1]
         const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${query.length}\r\n\r\n${query}`
         socket.write(response)
       } else if (path === "/user-agent") {
