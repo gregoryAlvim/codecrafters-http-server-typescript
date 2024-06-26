@@ -7,9 +7,8 @@ const server = net.createServer((socket) => {
     socket.on('data', (data) => {
       const [rest, body] = data.toString().split('\r\n\r\n')
       const [status, ...headers] = rest.split("\r\n");
-
-      const [method, rootPath, httpVersion] = status.split(" ");
-      const [_, path, param] = rootPath.split('/')
+      const [method, rootPath, _] = status.split(" ");
+      const [__, path, param] = rootPath.split('/')
 
       switch (path) {
         case "":
@@ -26,14 +25,24 @@ const server = net.createServer((socket) => {
         case "files":
           const directory = process.argv[3]
           const pathFile = directory + param
-          if (fs.existsSync(pathFile)) {
-            const stats = fs.statSync(pathFile)
-            const content = fs.readFileSync(pathFile)
+          
+          if (method === "POST") {
+            fs.writeFileSync(pathFile, body)
 
-            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${stats.size}\r\n\r\n${content}`)
-          } else {
-            sendResponse(notFoundResponse)
+            sendResponse("HTTP/1.1 201 Created\r\n\r\n")
           }
+
+          if (method === "GET") {
+            if (fs.existsSync(pathFile)) {
+              const stats = fs.statSync(pathFile)
+              const content = fs.readFileSync(pathFile)
+  
+              sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${stats.size}\r\n\r\n${content}`)
+            } else {
+              sendResponse(notFoundResponse)
+            }
+          }
+
           break;
         default:
           sendResponse(notFoundResponse)
