@@ -10,12 +10,22 @@ const server = net.createServer((socket) => {
       const request = data.toString().split(' ')
       console.log(request)
       const path = request[1]
-      console.log(path)
       const stringParam = path.split("/")[2]
-  
-      const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${stringParam.length}\r\n\r\n${stringParam}`
 
-      socket.write(response)
+      
+      if (path === "/") {
+        const response = `HTTP/1.1 200 OK\r\n\r\n`
+        socket.write(response)
+    
+      } else if (path === `/echo/${stringParam}`) {
+        const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${stringParam.length}\r\n\r\n${stringParam}`
+        socket.write(response)
+        
+      } else if (path.length === 0) {
+        const response = `HTTP/1.1 404 Not Found\r\n\r\n`
+        socket.write(response)
+      }
+
       socket.end()
     })
 });
