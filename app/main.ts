@@ -1,22 +1,25 @@
+import { request } from "http";
 import * as net from "net";
-
-const httpStatusCodes = {
-  200: "OK",
-  404: "Not Found",
-}
 
 const server = net.createServer((socket) => {
     socket.on('data', (data) => {
-      const request = data.toString().split(' ')
-      const path = request[1]
+      const [rest, body] = data.toString().split('\r\n\r\n')
+      const [status, ...headers] = rest.split("\r\n");
+
+      const path = status[1]
+      const userAgent = headers[3]
 
       if (path === "/") {
         const response = "HTTP/1.1 200 OK\r\n\r\n"
         socket.write(response)
       }
-      else if (path.includes("/echo/")) {
-        const stringParam = path.split("/")[2]
-        const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${stringParam.length}\r\n\r\n${stringParam}`
+      else if (path.includes("echo/")) {
+        const query = path.split("echo/")
+        const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${query.length}\r\n\r\n${query}`
+        socket.write(response)
+      } else if (path === "/user-agent") {
+        const userAgent = headers[3]
+        const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`
         socket.write(response)
       } else {
         const response = `HTTP/1.1 404 Not Found\r\n\r\n`
