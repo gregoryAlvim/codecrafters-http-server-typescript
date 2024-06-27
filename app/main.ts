@@ -23,12 +23,12 @@ const server = net.createServer((socket) => {
             if (acceptEncoding.includes("gzip")) {
               const compressedParam = zlib.gzipSync(param);
               console.log(compressedParam.length)
-              sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${compressedParam.length}\r\n\r\n`, false)
+              sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: ${compressedParam.length}\r\n\r\n`, false)
               sendResponse(compressedParam)
             }
           }
     
-          sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
+            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
           break;
         case "user-agent": { 
             const [_, userAgent] = headers[1].split(" ");
