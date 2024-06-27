@@ -8,7 +8,7 @@ const server = net.createServer((socket) => {
     socket.on('data', (data) => {
       const [rest, body] = data.toString().split('\r\n\r\n')
       const [status, ...headers] = rest.split("\r\n");
-      console.log("headers: ",headers)
+
       const [method, rootPath] = status.split(" ");
       const [_, path, param] = rootPath.split('/')
 
@@ -22,6 +22,7 @@ const server = net.createServer((socket) => {
           if (acceptEncoding) {
             if (acceptEncoding.includes("gzip")) {
               const compressedParam = zlib.gzipSync(param);
+              console.log(compressedParam.length)
               sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${compressedParam.length}\r\n\r\n`, false)
               sendResponse(compressedParam)
             }
