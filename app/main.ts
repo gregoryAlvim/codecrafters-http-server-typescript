@@ -17,15 +17,16 @@ const server = net.createServer((socket) => {
           break;
         case "echo":
           const acceptEncoding = headers[1] ?? undefined;
-          console.log(acceptEncoding)
+
           if (acceptEncoding) {
             const [_, value] = acceptEncoding.split(" ")
+
             if (value === "gzip") {
-              sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: ${value}\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
-            } else {
-              sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
+              return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: ${value}\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
             }
           }
+    
+          sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
           break;
         case "user-agent": { 
             const [_, userAgent] = headers[1].split(" ");
