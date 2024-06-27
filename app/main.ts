@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as net from "node:net";
+import * as zlib from "node:zlib";
 
 const notFoundResponse = "HTTP/1.1 404 Not Found\r\n\r\n"
 
@@ -20,7 +21,9 @@ const server = net.createServer((socket) => {
 
           if (acceptEncoding) {
             if (acceptEncoding.includes("gzip")) {
-              return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
+              const compressedBody = zlib.gzipSync(body);
+              const compressedBodySize = Buffer.byteLength(compressedBody, 'utf-8');
+              return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${compressedBodySize}\r\n\r\n${compressedBody}`)
             }
           }
     
