@@ -7,15 +7,20 @@ const server = net.createServer((socket) => {
     socket.on('data', (data) => {
       const [rest, body] = data.toString().split('\r\n\r\n')
       const [status, ...headers] = rest.split("\r\n");
-      const [method, rootPath, _] = status.split(" ");
-      const [__, path, param] = rootPath.split('/')
+      const [method, rootPath] = status.split(" ");
+      const [_, path, param] = rootPath.split('/')
 
       switch (path) {
         case "":
           sendResponse("HTTP/1.1 200 OK\r\n\r\n")
           break;
         case "echo":
-          sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
+          const [_, acceptEncoding] = headers[3].split(" ");
+          if (acceptEncoding === "gzip") {
+            sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: ${acceptEncoding}\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
+          } else {
+            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
+          }
           break;
         case "user-agent": { 
             const [_, userAgent] = headers[1].split(" ");
