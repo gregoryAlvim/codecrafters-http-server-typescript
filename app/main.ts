@@ -19,10 +19,8 @@ const server = net.createServer((socket) => {
           const acceptEncoding = headers[1] ?? undefined;
 
           if (acceptEncoding) {
-            const [_, value] = acceptEncoding.split(" ")
-
-            if (value === "gzip") {
-              return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: ${value}\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
+            if (acceptEncoding.includes("gzip")) {
+              return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
             }
           }
     
