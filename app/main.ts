@@ -2,9 +2,6 @@ import * as fs from "node:fs";
 import * as net from "node:net";
 import * as zlib from "node:zlib";
 
-const versionHTTP = "HTTP/1.1"
-const notFoundResponse = "HTTP/1.1 404 Not Found\r\n\r\n"
-
 type HttpHeaderKey = 
   | 'Content-Type'
   | 'Content-Encoding'
@@ -27,6 +24,8 @@ type HttpResponse = {
   headers?: HttpHeader;
   body?: Buffer | string;
 }
+
+const versionHTTP = "HTTP/1.1"
 
 function parseHttpRequest(data: Buffer): HttpRequest {
   const request = data.toString();
@@ -70,44 +69,69 @@ const server = net.createServer((socket) => {
       const { method, path, headers, body, } = parseHttpRequest(data)
       const [_, filteredPath, param] = path.split('/')
 
+      function sendResponse(response: Buffer | string) {
+        socket.write(response)
+        socket.end()
+      }
+
       switch (filteredPath) {
         case "":
           sendResponse(buildHttpResponse({ statusCode: 200, statusMessage: "OK" }))
-          break;
+        break;
         case "echo":
           const acceptEncoding = headers["Accept-Encoding"];
 
           if (acceptEncoding) {
             if (acceptEncoding.includes("gzip")) {
               const compressedParam = zlib.gzipSync(param);
+
               sendResponse(buildHttpResponse({ 
                 statusCode: 200, 
                 statusMessage: "OK", 
                 headers: { "Content-Type": "text/plain", "Content-Encoding": "gzip", "Content-Length": compressedParam.length.toString() },
                 body: compressedParam
               }))
-
             }
           }
-    
-            sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
-          break;
+
+          sendResponse(buildHttpResponse({ 
+            statusCode: 200, 
+            statusMessage: "OK", 
+            headers: { "Content-Type": "text/plain", "Content-Length": param.length.toString() },
+            body: param
+          }))
+        break;
         case "user-agent": { 
             const userAgent = headers["User-Agent"]
 
             if (userAgent) {
-              sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`)
+              sendResponse(buildHttpResponse({ 
+                statusCode: 200, 
+                statusMessage: "OK", 
+                headers: { "Content-Type": "text/plain", "Content-Length": userAgent.length.toString() },
+                body: userAgent
+              }))
             }
           }
-          break;
+        break;
         case "files":
           const directory = process.argv[3]
           const pathFile = directory + param
           
           if (method === "POST") {
-            fs.writeFileSync(pathFile, body)
+            try {
+              fs.writeFileSync(pathFile, body)
 
-            sendResponse("HTTP/1.1 201 Created\r\n\r\n")
+              sendResponse(buildHttpResponse({ 
+                statusCode: 201, 
+                statusMessage: "Created"
+              }))
+            } catch (error) {
+              sendResponse(buildHttpResponse({ 
+                statusCode: 400, 
+                statusMessage: "Bad Request"
+              }))
+            }
           }
 
           if (method === "GET") {
@@ -115,23 +139,28 @@ const server = net.createServer((socket) => {
               const stats = fs.statSync(pathFile)
               const content = fs.readFileSync(pathFile)
   
-              sendResponse(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${stats.size}\r\n\r\n${content}`)
+              sendResponse(buildHttpResponse({ 
+                statusCode: 200, 
+                statusMessage: "OK", 
+                headers: { "Content-Type": "application/octet-stream", "Content-Length": stats.size.toString() },
+                body: content
+              }))
             } else {
-              sendResponse(notFoundResponse)
+              sendResponse(buildHttpResponse({ 
+                statusCode: 404, 
+                statusMessage: "Not Found", 
+              }))
             }
           }
-
-          break;
+        break;
         default:
-          sendResponse(notFoundResponse)
-          break;
+          sendResponse(buildHttpResponse({ 
+            statusCode: 404, 
+            statusMessage: "Not Found", 
+          }))
+        break;
       }
     })
-
-    function sendResponse(response: Buffer | string, callback?: () => void) {
-      socket.write(response)
-      socket.end(callback)
-    }
 });
 
 server.listen(4221, "localhost", () => {
