@@ -17,7 +17,7 @@ const server = net.createServer((socket) => {
           sendResponse("HTTP/1.1 200 OK\r\n\r\n")
           break;
         case "echo":
-          const acceptEncoding = headers[3] ?? undefined;
+          const acceptEncoding = headers[1];
 
           if (acceptEncoding) {
             if (acceptEncoding.includes("gzip")) {
