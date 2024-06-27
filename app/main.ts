@@ -23,8 +23,10 @@ const server = net.createServer((socket) => {
             if (acceptEncoding.includes("gzip")) {
               const compressedParam = zlib.gzipSync(param);
               const hexParam = compressedParam.toString('hex');
+
               console.log("compressedParam: ", compressedParam)
               console.log("hexParam: ", hexParam)
+              
               const compressedParamSize = Buffer.byteLength(compressedParam, 'utf-8');
               return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${compressedParamSize}\r\n\r\n${hexParam}`)
             }
