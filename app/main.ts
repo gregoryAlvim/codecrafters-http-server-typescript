@@ -17,6 +17,7 @@ const server = net.createServer((socket) => {
           break;
         case "echo":
           const acceptEncoding = headers[1] ?? undefined;
+          console.log(acceptEncoding)
           if (acceptEncoding) {
             const [_, value] = acceptEncoding.split(" ")
             sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: ${value}\r\nContent-Type: text/plain\r\nContent-Length: ${param.length}\r\n\r\n${param}`)
