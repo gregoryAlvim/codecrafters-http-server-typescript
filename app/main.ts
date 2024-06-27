@@ -23,7 +23,7 @@ const server = net.createServer((socket) => {
             if (acceptEncoding.includes("gzip")) {
               const compressedParam = zlib.gzipSync(Buffer.from(param));
               const hexCompressedParam = compressedParam.toString('hex')
-              return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${hexCompressedParam.length}\r\n\r\n${hexCompressedParam}`)
+              sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${hexCompressedParam.length}\r\n\r\n`, hexCompressedParam)
             }
           }
     
@@ -62,8 +62,13 @@ const server = net.createServer((socket) => {
       }
     })
 
-    function sendResponse(response: string) {
-      socket.write(response)
+    function sendResponse(response: string, body?: string) {
+      if (body) {
+        socket.write(response)
+        socket.write(body)
+      } else {
+        socket.write(response)
+      }
       socket.end()
     }
 });
