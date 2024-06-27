@@ -23,6 +23,8 @@ const server = net.createServer((socket) => {
             if (acceptEncoding.includes("gzip")) {
               const compressedBody = zlib.gzipSync(body);
               const hexBody = compressedBody.toString('hex');
+              console.log("compressedBody: ", compressedBody)
+              console.log("hexBody: ", hexBody)
               const compressedBodySize = Buffer.byteLength(compressedBody, 'utf-8');
               return sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${compressedBodySize}\r\n\r\n${hexBody}`)
             }
