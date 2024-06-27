@@ -69,7 +69,7 @@ const server = net.createServer((socket) => {
       const { method, path, headers, body, } = parseHttpRequest(data)
       const [_, filteredPath, param] = path.split('/')
 
-      function sendResponse(response: Buffer | string) {
+      function sendResponse(response: Buffer) {
         socket.write(response)
         socket.end()
       }
@@ -81,17 +81,15 @@ const server = net.createServer((socket) => {
         case "echo":
           const acceptEncoding = headers["Accept-Encoding"];
 
-          if (acceptEncoding) {
-            if (acceptEncoding.includes("gzip")) {
-              const compressedParam = zlib.gzipSync(param);
+          if (acceptEncoding && acceptEncoding.includes("gzip")) {
+            const compressedParam = zlib.gzipSync(param);
 
-              sendResponse(buildHttpResponse({ 
-                statusCode: 200, 
-                statusMessage: "OK", 
-                headers: { "Content-Type": "text/plain", "Content-Encoding": "gzip", "Content-Length": compressedParam.length.toString() },
-                body: compressedParam
-              }))
-            }
+            sendResponse(buildHttpResponse({ 
+              statusCode: 200, 
+              statusMessage: "OK", 
+              headers: { "Content-Type": "text/plain", "Content-Encoding": "gzip", "Content-Length": compressedParam.length.toString() },
+              body: compressedParam
+            }))
           }
 
           sendResponse(buildHttpResponse({ 
