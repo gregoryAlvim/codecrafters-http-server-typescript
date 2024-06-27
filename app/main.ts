@@ -17,15 +17,17 @@ const server = net.createServer((socket) => {
           sendResponse("HTTP/1.1 200 OK\r\n\r\n")
           break;
         case "echo":
-          const acceptEncoding = headers[1] ?? undefined;
+          const acceptEncoding = headers[3] ?? undefined;
 
           if (acceptEncoding) {
             if (acceptEncoding.includes("gzip")) {
               const compressedParam = zlib.gzipSync(Buffer.from(param));
               const hexCompressedParam = compressedParam.toString('hex')
+
               console.log("compressedParam: ", compressedParam)
               console.log("hexCompressedParam: ", hexCompressedParam)
-              sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${hexCompressedParam.length}\r\n\r\n${hexCompressedParam}`)
+
+              sendResponse(`HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: ${compressedParam.length}\r\n\r\n${compressedParam}`)
             }
           }
     
