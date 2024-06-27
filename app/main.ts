@@ -62,11 +62,9 @@ const server = net.createServer((socket) => {
       }
     })
 
-    function sendResponse(response: string | Buffer, lastResponse?: boolean) {
-      console.log(response)
-      lastResponse = lastResponse ? lastResponse : true
+    function sendResponse(response: string) {
       socket.write(response)
-      lastResponse && socket.end()
+      socket.end()
     }
 });
 
